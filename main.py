@@ -31,7 +31,7 @@ def main():
 
     def generate_indics():
         # Setup parameters
-        start_date = datetime(2024, 2, 1)
+        start_date = datetime(2025, 2, 1)
         num_days = 120
         counterparties = [
             # "Shell",
@@ -120,20 +120,23 @@ def main():
             x=sell_trades["bl_date"],
             y=sell_trades["price_differential"],
             mode="markers",
-            name="Offers",
+            name="Offer",
             marker=dict(
-                color="red",
+                color=[
+                    "#f2aaa5" if bl_date < datetime(2025, 3, 15) else "red"
+                    for bl_date in sell_trades["bl_date"]
+                ],
                 size=sell_trades["volume"] / 85,
                 opacity=0.7,
                 line=dict(color="darkred", width=1),
             ),
             customdata=sell_trades["volume"],
+            text=sell_trades["counterparty"],
             hovertemplate="<b>Offer</b><br>"
             + "Date: %{x}<br>"
             + "Price Differential: %{y:.2f}<br>"
             + "Volume: %{customdata}<br>"
             + "Counterparty: %{text}",
-            text=sell_trades["counterparty"],
         )
     )
 
@@ -144,20 +147,23 @@ def main():
             x=buy_trades["bl_date"],
             y=buy_trades["price_differential"],
             mode="markers",
-            name="Bids",
+            name="Bid",
             marker=dict(
-                color="green",
+                color=[
+                    "#aaf0ba" if bl_date < datetime(2025, 3, 15) else "green"
+                    for bl_date in buy_trades["bl_date"]
+                ],
                 size=buy_trades["volume"] / 85,
                 opacity=0.7,
                 line=dict(color="darkgreen", width=1),
             ),
             customdata=buy_trades["volume"],
+            text=buy_trades["counterparty"],
             hovertemplate="<b>Bid</b><br>"
             + "Date: %{x}<br>"
             + "Price Differential: %{y:.2f}<br>"
             + "Volume: %{customdata}<br>"
             + "Counterparty: %{text}",
-            text=buy_trades["counterparty"],
         )
     )
 
