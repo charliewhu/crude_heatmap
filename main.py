@@ -70,7 +70,7 @@ def main():
             )  # More sell-side trades
 
             # Varied volume distribution
-            volume = np.random.choice([500, 950, 1000, 2000], p=[0.1, 0.3, 0.3, 0.3])
+            volume = np.random.choice([500, 950, 1000, 2000], p=[0.1, 0.4, 0.4, 0.1])
 
             trades.append(
                 {
@@ -113,6 +113,14 @@ def main():
     #     )
     # )
 
+    hovertemplate = (
+        "<b>Bid</b><br>"
+        + "BL Date: %{x}<br>"
+        + "Differential: %{y:.2f}<br>"
+        + "Volume: %{customdata}<br>"
+        + "Counterparty: %{text}"
+    )
+
     # Add Sell trades
     sell_trades = df[df["type"] == "Offer"]
     fig.add_trace(
@@ -132,11 +140,7 @@ def main():
             ),
             customdata=sell_trades["volume"],
             text=sell_trades["counterparty"],
-            hovertemplate="<b>Offer</b><br>"
-            + "Date: %{x}<br>"
-            + "Price Differential: %{y:.2f}<br>"
-            + "Volume: %{customdata}<br>"
-            + "Counterparty: %{text}",
+            hovertemplate=hovertemplate,
         )
     )
 
@@ -159,11 +163,7 @@ def main():
             ),
             customdata=buy_trades["volume"],
             text=buy_trades["counterparty"],
-            hovertemplate="<b>Bid</b><br>"
-            + "Date: %{x}<br>"
-            + "Price Differential: %{y:.2f}<br>"
-            + "Volume: %{customdata}<br>"
-            + "Counterparty: %{text}",
+            hovertemplate=hovertemplate,
         )
     )
 
