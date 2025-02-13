@@ -48,7 +48,7 @@ def main():
 
         trades = []
 
-        for i in range(100):  # Large number of trades
+        for i in range(50):  # Large number of trades
             # Random date within our date range
             bl_date = start_date + timedelta(days=np.random.randint(0, num_days))
 
@@ -85,13 +85,40 @@ def main():
                 }
             )
 
+        # Generate confirmed trades (executed trades)
+        confirmed_trades = []
+        num_confirmed = 15  # Fewer confirmed trades than indicative ones
+
+        for i in range(num_confirmed):
+            # Add start and end dates for the horizontal lines
+            bl_date = start_date + timedelta(days=np.random.randint(0, num_days))
+            line_duration = timedelta(days=5)  # 5 after bl
+
+            date_index = (bl_date - start_date).days
+            base_price = random_walk_prices[date_index]
+
+            # Create both buy and sell levels for each confirmed trade
+            buy_price = round(base_price - np.random.uniform(0.2, 0.5), 2)
+            sell_price = round(base_price + np.random.uniform(0.2, 0.5), 2)
+            volume = np.random.choice([500, 750, 1000])
+
+            confirmed_trades.append(
+                {
+                    "bl_date": bl_date,
+                    "line_end_date": bl_date + line_duration,
+                    "buy_price": buy_price,
+                    "sell_price": sell_price,
+                    "volume": volume,
+                }
+            )
+
         # Convert to DataFrame
         df = pd.DataFrame(trades)
 
-        return df, random_walk_prices, start_date
+        return df, pd.DataFrame(confirmed_trades), random_walk_prices, start_date
 
     # Generate the trading data
-    df, random_walk_prices, start_date = generate_indics()
+    df, confirmed_df, random_walk_prices, start_date = generate_indics()
 
     # Create interactive Plotly visualization
     fig = go.Figure()
@@ -113,13 +140,44 @@ def main():
     #     )
     # )
 
+    # Add confirmed trade levels
+
+    for _, trade in confirmed_df.iterrows():
+        # Add horizontal buy line
+        fig.add_trace(
+            go.Scatter(
+                x=[trade["bl_date"], trade["line_end_date"]],
+                y=[trade["buy_price"], trade["buy_price"]],
+                mode="lines",
+                name="Confirmed Buy",
+                line=dict(color="darkgreen", width=2, dash="dash"),
+                showlegend=False,
+                hovertemplate=f'Confirmed Buy<br>Price: {trade["buy_price"]:.2f}<br>Volume: {trade["volume"]}',
+            )
+        )
+
+        # Add horizontal sell line
+        fig.add_trace(
+            go.Scatter(
+                x=[trade["bl_date"], trade["line_end_date"]],
+                y=[trade["sell_price"], trade["sell_price"]],
+                mode="lines",
+                name="Confirmed Sell",
+                line=dict(color="darkred", width=2, dash="dash"),
+                showlegend=False,
+                hovertemplate=f'Confirmed Sell<br>Price: {trade["sell_price"]:.2f}<br>Volume: {trade["volume"]}',
+            )
+        )
+
     hovertemplate = (
-        "<b>Bid</b><br>"
-        + "BL Date: %{x}<br>"
+        "BL Date: %{x}<br>"
         + "Differential: %{y:.2f}<br>"
         + "Volume: %{customdata}<br>"
         + "Counterparty: %{text}"
     )
+
+    bid_template = "<b>Bid</b><br>" + hovertemplate
+    offer_template = "<b>Offer</b><br>" + hovertemplate
 
     # Add Sell trades
     sell_trades = df[df["type"] == "Offer"]
@@ -140,7 +198,7 @@ def main():
             ),
             customdata=sell_trades["volume"],
             text=sell_trades["counterparty"],
-            hovertemplate=hovertemplate,
+            hovertemplate=offer_template,
         )
     )
 
@@ -163,7 +221,7 @@ def main():
             ),
             customdata=buy_trades["volume"],
             text=buy_trades["counterparty"],
-            hovertemplate=hovertemplate,
+            hovertemplate=bid_template,
         )
     )
 
