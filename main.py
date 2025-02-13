@@ -150,7 +150,7 @@ def main():
                 y=[trade["buy_price"], trade["buy_price"]],
                 mode="lines",
                 name="Confirmed Buy",
-                line=dict(color="darkgreen", width=2, dash="dash"),
+                line=dict(color="darkgreen", width=2),
                 showlegend=False,
                 hovertemplate=f'Confirmed Buy<br>Price: {trade["buy_price"]:.2f}<br>Volume: {trade["volume"]}',
             )
@@ -163,7 +163,7 @@ def main():
                 y=[trade["sell_price"], trade["sell_price"]],
                 mode="lines",
                 name="Confirmed Sell",
-                line=dict(color="darkred", width=2, dash="dash"),
+                line=dict(color="darkred", width=2),
                 showlegend=False,
                 hovertemplate=f'Confirmed Sell<br>Price: {trade["sell_price"]:.2f}<br>Volume: {trade["volume"]}',
             )
